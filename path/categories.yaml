@@ -1,0 +1,20 @@
+openapi: 3.0.0
+info:
+  title: "Accounting path segment used to group related resources"
+  version: "1.0.0"
+paths: 
+  /accounting/invoices:
+    get:
+      responses:
+        200: 
+          description: ok
+  /accounting/generalLedger:
+    get:
+      responses:
+        200: 
+          description: ok
+  /accounting/accounts:
+    get:
+      responses:
+        200: 
+          description: ok
