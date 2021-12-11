@@ -1,5 +1,8 @@
 # API Anatomy
 
+This repository is an attempt at defining a set of application level terminology for HTTP API design.  Along with each term is a description and an OpenAPI description of an example API demonstrating its use.  
+
+The intent of this collection is not to suggest best practices but to be a set of scenario examples that tooling developers can use to verify that they provide broad support for API designers.
 ## Resource Design
 
 A HTTP api is defined by a set of resources that a consumer interacts with to achieve some desired objective. Each resource is idenified by a URI. That's why it is called a Universal Resource Identifier. Most API designers these days use just the path portion of the URI to identify the domain concept of interest. The authority part, i.e. schema and host, are just used to identify where the service is deployed, and the query parameters are used to mainpulate the response in some way to change how the domain concept is presented.
