@@ -8,8 +8,8 @@ A HTTP api is defined by a set of resources that a consumer interacts with to ac
 
 | Kind | Description
 |---|---|
-|Category | Organizational segment used to group related resources together in the hierarchy. e.g. <code>https://example.org/<strong>accounting</strong>/invoices</code>|
-|Data Partition | Segment used to partition different sets of similarly structured data. e.g. <code>https://example.org/<strong>acme</strong>/employees</code>|
+|[Category](./path/category.yaml) | Organizational segment used to group related resources together in the hierarchy. e.g. <code>https://example.org/<strong>accounting</strong>/invoices</code>|
+|[Data Partition](./path/data-partition.yaml) | Segment used to partition different sets of similarly structured data. e.g. <code>https://example.org/<strong>acme</strong>/employees</code>|
 |Version | Segment used to partition resource hierarchies due to breaking changes in resource structure or behavior. e.g. <code>https://example.org/<strong>v1</strong>/users</code>|
 |Global key/value pair| A segment pair used to attach some value to resources in the sub hierarchy.  e.g. <code>https://example.org/<strong>subscription/XHJSD-JSDS-UERJE</strong>/resources</code> |
 |Collections | A segment used to indicate a set of some domain concept. |

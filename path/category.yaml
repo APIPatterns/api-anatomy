@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
   title: "Accounting path segment used to group related resources"
   version: "1.0.0"
