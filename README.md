@@ -11,39 +11,39 @@ A HTTP api is defined by a set of resources that a consumer interacts with to ac
 
 | Kind | Description
 |---|---|
-|[Category](./path/category.yaml) | Organizational segment used to group related resources together in the hierarchy. e.g. <code>https://example.org/<strong>accounting</strong>/invoices</code>|
-|[Data Partition](./path/data-partition.yaml) | Segment used to partition different sets of similarly structured data. e.g. <code>https://example.org/<strong>acme</strong>/employees</code>|
-|Version | Segment used to partition resource hierarchies due to breaking changes in resource structure or behavior. e.g. <code>https://example.org/<strong>v1</strong>/users</code>|
-|Global key/value pair| A segment pair used to attach some value to resources in the sub hierarchy.  e.g. <code>https://example.org/<strong>subscription/XHJSD-JSDS-UERJE</strong>/resources</code> |
-|Collections | A segment used to indicate a set of some domain concept. |
-|Item | A segment used to indicate a specific instance of some domain concept within a set. |
-|Relationship| A segment used to indicate a relationship between one domain concept and another. |
-|Multi-segment | A set of segments used to allow API consumers to define a hierarchy for a set of domain concepts. |
-|Matrix| A rarely used capability to insert a multi-dimensional table of domain concepts into a hierarchy. |
-|View| A path segment used to explicitly indicate an alternate resource for the same domain concept. |
-|Action| A segment used to perform an unsafe operation on either a related resource or some kind of data processing on the transfered information. |
-|Function| A segment used create results that are usually an aggregation of domain concepts or some derivative of a domain concept. |
+|[Category](./path/category.yaml) | Organizational segment used to group related resources together in the hierarchy. e.g. <code>https://example.org/accounting/invoices</code>|
+|[Data Partition](./path/data-partition.yaml) | Segment used to partition different sets of similarly structured data. e.g. <code>https://example.org/acme/employees</code>|
+|Version | Segment used to partition resource hierarchies due to breaking changes in resource structure or behavior. e.g. <code>https://example.org/v1/users</code>|
+|Key/value pair| A segment pair used to attach some value to resources in the sub hierarchy.  e.g. <code>https://example.org/subscription/XHJSD-JSDS-UERJE/resources</code> |
+|Collections | A segment used to indicate a set of some domain concept. e.g. <code>https://example.org/movies</code> |
+|Item | A segment used to indicate a specific instance of some domain concept within a set. e.g. <code>https://example.org/movies/some-movie-id</code>|
+|Relationship| A segment used to indicate a relationship between one domain concept and another. e.g. <code>https://example.org/movies/some-movie-id/actors</code>|
+|Multi-segment | A set of segments used to allow API consumers to define a hierarchy for a set of domain concepts. e.g. <code>https://example.org/bookmarks/personal/cooking/testkitchen</code> |
+|Matrix| A rarely used capability to insert a multi-dimensional table of domain concepts into a hierarchy. e.g. <code>https://example.org/bookmarks/personal/cooking/testkitchen</code> |
+|View| A path segment used to explicitly indicate an alternate resource for the same domain concept. e.g. <code>https://example.org/bookmarks/personal/cooking/testkitchen</code> |
+|Action| A segment used to perform an unsafe operation on either a related resource or some kind of data processing on the transfered information. <code>https://example.org/me/invites/accept</code>|
+|Function| A segment used create results that are usually an aggregation of domain concepts or some derivative of a domain concept. <code>https://example.org/me/documents/recentlyUsed</code>|
 
 #### Behavior
-    - does the order imply hierarchy. Some types require a location in the URLs
+The set of path segments defines a hierarchy. Path segments provide context to the following segments. This can have a significant impact for some types of path segment. A version segment at the far left of a path, has a very different impact than one at the far right of the path.
+The hierarchial nature of paths, are the major differentiator between path segments and query parameters.  
 
 ### Query parameters
 
-Query parameters are used to create variants of the resource identified by the path. Each of these variants is technically a resource on its own as it has a distinct URL. However, generally variants created by query parameters will share many of the same characteristics of the resource identified by just the path.  
+Query parameters are used to create variants of the resource identified by the path. Each of these variants is technically a resource on its own as it has a distinct URL. However, generally, variants created by query parameters will share many of the same characteristics of the resource identified by just the path.  
 
 #### Kinds
 
 | Kind | Description
 |---|---|
-| Projection| Creates a resource that contains a subset of the properties contained in the path only resource.|
-| Filtering| Creates a resource that contains a subset of the members of the path only resource. |
-| Sorting||
-| Limits||
-| Paging||
-| Transclusion||
-| Sparse identifiers||
-| Behavior modifiers||
-| Representation format||
+| Projection| Identifies a resource that contains a subset of the information contained in the path-only resource. Consider this a vertical slice of the path-only resource. https://example.org/books?select=Title,Author |
+| Filtering| Identifies a resource that contains a subset of the items from of the path-only resource. Consider this a horizontal slide of the path-only resource. e.g. http://example.org/books?author=Smith|
+| Sorting|Identifies a resource that contains a set of items from the path-only resource in some specified order. e.g. <code>https://example.org/tasks?orderBy=Deadline</code> |
+| Range | Identifies a resource that contains a subset of items from the path-only resource based on a ordinal constraints. e.g. <code>https://example.org/tasks?top=10&skip=50</code> |
+| Transclusion| Enables a caller to include a representation of a related resource into the representation of the path-only resource. e.g. <code>https://example.org/users/22?$expand=manager</code>|
+| Sparse identifiers| Identifies a resource using n property values within a n-space. e.g. <code>https://example.org/map/image?lat=100&long=50</code> |
+| Behavior modifiers| Identifies a resource that is a variant of the path-only resource in some domain specific way. e.g. <code>https://example.org/me/calendar?view=week</code> |
+| Representation format|Identifies a resource that is a variant of the path-only resource in the format of the reprentation. e.g. <code>https://example.org/me/tasks?format=CSV</code>|
 
 #### Types
     - strings
@@ -67,7 +67,7 @@ Query parameters are used to create variants of the resource identified by the p
 | Tunneled requests | |
 | Batches | |
 | Long running | |
-| NoContent or Content | |
+| NoContent or Content | Some HTTP interactions return a representation of the resource that is being interacted with, others do not. Whether content is returned or not is generally based on a combination of the method and the status code. |
 | Prefer header | |
 | Accept | |
 | Idempotency | |
