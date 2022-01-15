@@ -7,6 +7,8 @@ openapi: 3.0.3
 info:
   title: "Accounting path segment used to group related resources"
   version: "1.0.0"
+servers:
+  - url: https://api.example.org/
 paths: 
   /accounting/invoices:
     get:

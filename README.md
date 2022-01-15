@@ -34,7 +34,6 @@ The hierarchial nature of a path is the major differentiator between path segmen
 
 Query parameters are used to create variants of the resource identified by the path. Each of these variants is technically a resource on its own as it has a distinct URL. However, generally, variants created by query parameters will share many of the same characteristics of the resource identified by just the path.  
 
-#### Kinds
 
 | Kind | Description
 |---|---|
@@ -47,15 +46,13 @@ Query parameters are used to create variants of the resource identified by the p
 | Behavior modifiers| Identifies a resource that is a variant of the path-only resource in some domain specific way. e.g. <code>https://example.org/me/calendar?view=week</code> |
 | Representation format|Identifies a resource that is a variant of the path-only resource in the format of the reprentation. e.g. <code>https://example.org/me/tasks?format=CSV</code>|
 
-#### Parameter Types
+URLs are serialized as strings when being used by HTTP. However, the values used for parameters in the URL often have additional semantics that do not have standardized string serializations.
 
-URLs are serialized as strings when being used by HTTP. However, the values used for parameters in the URL often have additional semantics and are do not have standardized string serializations.
-
-| Type | Serialization Notes |
+| Parameter Type | Serialization Notes |
 |---|---|
-| strings | Percent encoding. (Reserved, gen-delims, semi-delims), quoted or not, single or double  |
-| arrays of strings | comma delim |
-| expressions |  |
+| strings | Serialization examples include: `apple` or `"apple"` or `'apple'`  |
+| arrays of strings | Some examples of ways that arrays of strings can be represented include: `"apple,banana,pear"` or `["apple","banana","pear"]` or `apple,banana,pear` |
+| expressions | Examples in query parameters include `filter=fruit eq "apple"` and `filter[fruit]=apple` |
 | json | |
 | dynamic form data |  |
 | dates | ISO, unix |
@@ -63,26 +60,28 @@ URLs are serialized as strings when being used by HTTP. However, the values used
 | Constrained types | enums? |
 
 #### Behavior
+Beyond the kind of parameters and data types of individual parameters, there are often dependencies between parameters that appear in a URL.  
 
 | Type | Serialization Notes |
 |---|---|
-| Dependent parameters | |
-| Parameter ordering | |
-| Parameter name casing | |
+| Optional parameters | Optional path parameters can be challenging unless they are a key/value segment pair.  Query parameters are commonly optional. Making query parameters required is a burden on client applications and can introduce challenges with relative references. |
+| Dependent parameters | Due to the natural hierarchy of path segments, path parameters are frequently dependent on the value of parameters higher in the hierarchy. Interdependencies between query parameters are possible, but they are difficult to describe in metadata and hard to enforce in client code. |
+| Parameter ordering | Most APIs do not enforce any ordering of query parameters. However, technically, different parameter orders are different URLs and therefore different resources. This mainly affects intermediaries like caches, that need to do some normalization to prevent multiple copies of representations.|
+| Parameter name casing | Query parameter names are technically case sensitive, but in practice they rarely are. Intermediaries will often need to normalize URLs to determine a canonical URL. |
 | Encoding issues | |
 
 ## Requests
 
 | Feature | Description
 |---|---|
-| Tunneled requests | |
-| Batches | |
-| Prefer header | |
-| Accept | |
-| Idempotency | |
-| Authenticated Interactions | |
-| Paid interactions | |
-| Detecting changes in data | |
+| Prefer header | The prefer request header can be used for a variety of purposes including suggesting the size of response representation to be returned, or to indicate a preference for a long running operation. |
+| Accept | An accept header can be used by a client to request different representations (i.e. different media types) of the same resource.  This is often also achieved using a query parameter.  |
+| Idempotency | Some HTTP interactions are by definition idepempotent.  Others can be made idempotent by including a unique value in the request. This can be important for requests that must only execute once, even with an unreliable network. |
+| Authenticated Interactions | Some resources should only be accessible by clients that have the appropriate authentication. Ideally, the `Authorization` HTTP header is used for this. There are some alterative solutions for certain circumstances.|
+| Paid interactions | API providers sometimes choose to charge for a client to make an API request. APIs should indicate when a payment mechanism must be provided. Identifiers of payment mechanisms can be provided in the request, or can be tied to an authenticated identity.|
+| Detecting changes in data | API consumers often want to retrieve changes to a resource, since some prior point in time.  There are a variety of ways this can be achieved. |
+| Tunneled requests | This is sometimes an anti-pattern where part of the request message, either headers or body, is used to identity what could be identified in the URL. There may be valid reasons for doing this but it is important to understand the trade-offs of not identifying the distinct resources via the URL. |
+| Batches | Batching is an application level solution to being able to make multiple requests in a single HTTP message.  This can be a performance optimization for HTTP/1.1 based requests due to the limited number of TCP/IP connections allowed from some clients.  However, it is rarely the right solution when using HTTP/2.|
 
 ## Responses
 
