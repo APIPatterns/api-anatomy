@@ -1,0 +1,29 @@
+{
+  "descriptionHash": "C9400CAE5BA679050EA49EEB9075BD14847F95A5C4D92A74D936D69D160D648955075C4DFB7D064BE39044D54FCDBE86E1814E1D047E9FB82ACF4CCE47E84966",
+  "descriptionLocation": "C:\\Users\\darrmi\\src\\github\\APIPatterns\\api-anatomy\\clients\\kiota\\csharp\\..\\..\\openapi.yaml",
+  "lockFileVersion": "1.0.0",
+  "kiotaVersion": "1.0.1",
+  "clientClassName": "ApiClient",
+  "clientNamespaceName": "ApiSdk",
+  "language": "CSharp",
+  "usesBackingStore": false,
+  "includeAdditionalData": true,
+  "serializers": [
+    "Microsoft.Kiota.Serialization.Json.JsonSerializationWriterFactory",
+    "Microsoft.Kiota.Serialization.Text.TextSerializationWriterFactory",
+    "Microsoft.Kiota.Serialization.Form.FormSerializationWriterFactory"
+  ],
+  "deserializers": [
+    "Microsoft.Kiota.Serialization.Json.JsonParseNodeFactory",
+    "Microsoft.Kiota.Serialization.Text.TextParseNodeFactory",
+    "Microsoft.Kiota.Serialization.Form.FormParseNodeFactory"
+  ],
+  "structuredMimeTypes": [
+    "application/json",
+    "text/plain",
+    "application/x-www-form-urlencoded"
+  ],
+  "includePatterns": [],
+  "excludePatterns": [],
+  "disabledValidationRules": []
+}
