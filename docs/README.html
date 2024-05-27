@@ -1,0 +1,441 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>API Anatomy | API Anatomy </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="API Anatomy | API Anatomy ">
+      
+      <link rel="icon" href="favicon.ico">
+      <link rel="stylesheet" href="public/docfx.min.css">
+      <link rel="stylesheet" href="public/main.css">
+      <meta name="docfx:navrel" content="toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      <meta name="docfx:rel" content="">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/APIPatterns/api-anatomy/blob/main/README.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+  </head>
+
+  <script type="module" src="./public/docfx.min.js"></script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="index.html">
+            <img id="logo" class="svg" src="logo.svg" alt="api-anatomy">
+            api-anatomy
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="api-anatomy">API Anatomy</h1>
+
+<p>This repository is an attempt at defining a set of application level terminology for HTTP API design.  Along with each term is a description and an OpenAPI description of an example API demonstrating its use.</p>
+<p>The intent of this collection is not to suggest best practices but to be a set of scenario examples that tooling developers can use to verify that they provide broad support for API designers.</p>
+<h2 id="resource-design">Resource Design</h2>
+<p>A HTTP API is a set of resources, identified by URL, that share a common base URL.</p>
+<p>A HTTP API is a set of resources that a consumer interacts with to achieve some desired objective. Each resource is identified by a URI. That's why it is called a Universal Resource Identifier. All resources in a HTTP API share a common base URL. Most API designers these days use just the path portion of the URL to identify the domain concept of interest. The authority part, i.e. schema and host, are just used to identify where the service is deployed, and the query parameters are used to manipulate the response in some way to change how the domain concept is presented.</p>
+<h3 id="path-segments">Path segments</h3>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="path/category.html">Category</a></td>
+<td>Organizational segment used to group related resources together in the hierarchy. e.g. <code>https://example.org/accounting/invoices</code></td>
+</tr>
+<tr>
+<td><a href="path/data-partition.html">Data Partition</a></td>
+<td>Segment used to partition different sets of similarly structured data. e.g. <code>https://example.org/acme/employees</code></td>
+</tr>
+<tr>
+<td><a href="path/version.html">Version</a></td>
+<td>Segment used to partition resource hierarchies due to breaking changes in resource structure or behavior. e.g. <code>https://example.org/v1/users</code></td>
+</tr>
+<tr>
+<td><a href="path/key-value-pair.html">Key/value pair</a></td>
+<td>A segment pair used to attach some value to resources in the sub hierarchy.  e.g. <code>https://example.org/subscription/XHJSD-JSDS-UERJE/resources</code></td>
+</tr>
+<tr>
+<td><a href="path/collection.html">Collection</a></td>
+<td>A segment used to indicate a set of some domain concept. e.g. <code>https://example.org/movies</code></td>
+</tr>
+<tr>
+<td><a href="path/item.html">Item</a></td>
+<td>A segment used to indicate a specific instance of some domain concept within a set. e.g. <code>https://example.org/movies/some-movie-id</code></td>
+</tr>
+<tr>
+<td><a href="path/relationship.html">Relationship</a></td>
+<td>A segment used to indicate a relationship between one domain concept and another. e.g. <code>https://example.org/movies/some-movie-id/actors</code></td>
+</tr>
+<tr>
+<td><a href="path/multi-segment.html">Multi-segment</a></td>
+<td>A set of segments used to allow API consumers to define a hierarchy for a set of domain concepts. e.g. <code>https://example.org/bookmarks/personal/cooking/testkitchen</code></td>
+</tr>
+<tr>
+<td><a href="path/matrix.html">Matrix</a></td>
+<td>A rarely used capability to insert a multi-dimensional table of domain concepts into a hierarchy. e.g. <code>https://example.org/countries;continent=asia/cities</code></td>
+</tr>
+<tr>
+<td><a href="./path/view.md">View</a></td>
+<td>A path segment used to explicitly indicate an alternate resource for the same domain concept. e.g. <code>https://example.org/recipies/eggnog;printable</code></td>
+</tr>
+<tr>
+<td><a href="./path/action.md">Action</a></td>
+<td>A segment used to perform an unsafe operation on either a related resource or some kind of data processing on the transfered information. <code>https://example.org/me/invites/accept</code></td>
+</tr>
+<tr>
+<td><a href="path/function.html">Function</a></td>
+<td>A segment used create results that are usually an aggregation of domain concepts or some derivative of a domain concept. <code>https://example.org/me/documents/recentlyUsed</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="behavior">Behavior</h4>
+<p>The set of path segments defines a hierarchy. Path segments provide context to the following segments. This can have a significant impact for some types of path segment. A version segment at the far left of a path, has a very different impact than one at the far right of the path.
+The hierarchial nature of a path is the major differentiator between path segments and query parameters.</p>
+<h3 id="query-parameters">Query parameters</h3>
+<p>Query parameters are used to create variants of the resource identified by the path. Each of these variants is technically a resource on its own as it has a distinct URL. However, generally, variants created by query parameters will share many of the same characteristics of the resource identified by just the path.</p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Projection</td>
+<td>Identifies a resource that contains a subset of the information contained in the path-only resource. Consider this a vertical slice of the path-only resource. <a href="https://example.org/books?select=Title,Author">https://example.org/books?select=Title,Author</a></td>
+</tr>
+<tr>
+<td>Filtering</td>
+<td>Identifies a resource that contains a subset of the items from of the path-only resource. Consider this a horizontal slide of the path-only resource. e.g. <a href="http://example.org/books?author=Smith%7C">http://example.org/books?author=Smith|</a></td>
+</tr>
+<tr>
+<td>Sorting</td>
+<td>Identifies a resource that contains a set of items from the path-only resource in some specified order. e.g. <code>https://example.org/tasks?orderBy=Deadline</code></td>
+</tr>
+<tr>
+<td>Range</td>
+<td>Identifies a resource that contains a subset of items from the path-only resource based on a ordinal constraints. e.g. <code>https://example.org/tasks?top=10&amp;skip=50</code></td>
+</tr>
+<tr>
+<td>Transclusion</td>
+<td>Enables a caller to include a representation of a related resource into the representation of the path-only resource. e.g. <code>https://example.org/users/22?$expand=manager</code></td>
+</tr>
+<tr>
+<td>Sparse identifiers</td>
+<td>Identifies a resource using n property values within a n-space. e.g. <code>https://example.org/map/image?lat=100&amp;long=50</code></td>
+</tr>
+<tr>
+<td>Behavior modifiers</td>
+<td>Identifies a resource that is a variant of the path-only resource in some domain specific way. e.g. <code>https://example.org/me/calendar?view=week</code></td>
+</tr>
+<tr>
+<td>Representation format</td>
+<td>Identifies a resource that is a variant of the path-only resource in the format of the reprentation. e.g. <code>https://example.org/me/tasks?format=CSV</code></td>
+</tr>
+</tbody>
+</table>
+<p>URLs are serialized as strings when being used by HTTP. However, the values used for parameters in the URL often have additional semantics that do not have standardized string serializations.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter Type</th>
+<th>Serialization Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>strings</td>
+<td>Serialization examples include: <code>apple</code> or <code>&quot;apple&quot;</code> or <code>'apple'</code></td>
+</tr>
+<tr>
+<td>arrays of strings</td>
+<td>Some examples of ways that arrays of strings can be represented include: <code>&quot;apple,banana,pear&quot;</code> or <code>[&quot;apple&quot;,&quot;banana&quot;,&quot;pear&quot;]</code> or <code>apple,banana,pear</code></td>
+</tr>
+<tr>
+<td>expressions</td>
+<td>Examples in query parameters include <code>filter=fruit eq &quot;apple&quot;</code> and <code>filter[fruit]=apple</code></td>
+</tr>
+<tr>
+<td>json</td>
+<td></td>
+</tr>
+<tr>
+<td>dynamic form data</td>
+<td></td>
+</tr>
+<tr>
+<td>dates</td>
+<td>ISO, unix</td>
+</tr>
+<tr>
+<td>numbers</td>
+<td></td>
+</tr>
+<tr>
+<td>Constrained types</td>
+<td>enums?</td>
+</tr>
+</tbody>
+</table>
+<h4 id="behavior-1">Behavior</h4>
+<p>Beyond the kind of parameters and data types of individual parameters, there are often dependencies between parameters that appear in a URL.</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Serialization Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Optional parameters</td>
+<td>Optional path parameters can be challenging unless they are a key/value segment pair.  Query parameters are commonly optional. Making query parameters required is a burden on client applications and can introduce challenges with relative references.</td>
+</tr>
+<tr>
+<td>Dependent parameters</td>
+<td>Due to the natural hierarchy of path segments, path parameters are frequently dependent on the value of parameters higher in the hierarchy. Interdependencies between query parameters are possible, but they are difficult to describe in metadata and hard to enforce in client code.</td>
+</tr>
+<tr>
+<td>Parameter ordering</td>
+<td>Most APIs do not enforce any ordering of query parameters. However, technically, different parameter orders are different URLs and therefore different resources. This mainly affects intermediaries like caches, that need to do some normalization to prevent multiple copies of representations.</td>
+</tr>
+<tr>
+<td>Parameter name casing</td>
+<td>Query parameter names are technically case sensitive, but in practice they rarely are. Intermediaries will often need to normalize URLs to determine a canonical URL.</td>
+</tr>
+<tr>
+<td>Encoding issues</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="requests">Requests</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prefer header</td>
+<td>The prefer request header can be used for a variety of purposes including suggesting the size of response representation to be returned, or to indicate a preference for a long running operation.</td>
+</tr>
+<tr>
+<td>Accept</td>
+<td>An accept header can be used by a client to request different representations (i.e. different media types) of the same resource.  This is often also achieved using a query parameter.</td>
+</tr>
+<tr>
+<td>Idempotency</td>
+<td>Some HTTP interactions are by definition idepempotent.  Others can be made idempotent by including a unique value in the request. This can be important for requests that must only execute once, even with an unreliable network.</td>
+</tr>
+<tr>
+<td>Authenticated Interactions</td>
+<td>Some resources should only be accessible by clients that have the appropriate authentication. Ideally, the <code>Authorization</code> HTTP header is used for this. There are some alterative solutions for certain circumstances.</td>
+</tr>
+<tr>
+<td>Paid interactions</td>
+<td>API providers sometimes choose to charge for a client to make an API request. APIs should indicate when a payment mechanism must be provided. Identifiers of payment mechanisms can be provided in the request, or can be tied to an authenticated identity.</td>
+</tr>
+<tr>
+<td>Detecting changes in data</td>
+<td>API consumers often want to retrieve changes to a resource, since some prior point in time.  There are a variety of ways this can be achieved.</td>
+</tr>
+<tr>
+<td>Tunneled requests</td>
+<td>This is sometimes an anti-pattern where part of the request message, either headers or body, is used to identity what could be identified in the URL. There may be valid reasons for doing this but it is important to understand the trade-offs of not identifying the distinct resources via the URL.</td>
+</tr>
+<tr>
+<td>Batches</td>
+<td>Batching is an application level solution to being able to make multiple requests in a single HTTP message.  This can be a performance optimization for HTTP/1.1 based requests due to the limited number of TCP/IP connections allowed from some clients.  However, it is rarely the right solution when using HTTP/2.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="responses">Responses</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Redirects</td>
+<td></td>
+</tr>
+<tr>
+<td>Throttling</td>
+<td></td>
+</tr>
+<tr>
+<td>Long running</td>
+<td></td>
+</tr>
+<tr>
+<td>NoContent or Content</td>
+<td>Some HTTP interactions return a representation of the resource that is being interacted with, others do not. Whether content is returned or not is generally based on a combination of the method and the status code.</td>
+</tr>
+<tr>
+<td>Partial failure</td>
+<td></td>
+</tr>
+<tr>
+<td>Redirects</td>
+<td></td>
+</tr>
+<tr>
+<td>Cachable content</td>
+<td></td>
+</tr>
+<tr>
+<td>Deleted</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="representation-design">Representation Design</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Media types</td>
+<td></td>
+</tr>
+<tr>
+<td>Multi format responses</td>
+<td></td>
+</tr>
+<tr>
+<td>Batch</td>
+<td></td>
+</tr>
+<tr>
+<td>Polymorphic responses</td>
+<td></td>
+</tr>
+<tr>
+<td>Null vs absence</td>
+<td></td>
+</tr>
+<tr>
+<td>Deprecation</td>
+<td></td>
+</tr>
+<tr>
+<td>Collections vs items</td>
+<td></td>
+</tr>
+<tr>
+<td>Facets</td>
+<td></td>
+</tr>
+<tr>
+<td>Annotations</td>
+<td></td>
+</tr>
+<tr>
+<td>Links</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="other">Other</h2>
+<ul>
+<li>Security</li>
+<li>Privacy</li>
+<li>Workflow (sequences of requests)</li>
+<li>Errors</li>
+</ul>
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

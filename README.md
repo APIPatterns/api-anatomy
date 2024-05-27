@@ -6,9 +6,9 @@ The intent of this collection is not to suggest best practices but to be a set o
 
 ## Resource Design
 
-A HTTP API is a set of resources, identified by URL, that share a common base URL.   
+A HTTP API is a set of resources, identified by URL, that share a common base URL.
 
-A HTTP API is a set of resources that a consumer interacts with to achieve some desired objective. Each resource is idenified by a URI. That's why it is called a Universal Resource Identifier. All resources in a HTTP API share a common base URL. Most API designers these days use just the path portion of the URL to identify the domain concept of interest. The authority part, i.e. schema and host, are just used to identify where the service is deployed, and the query parameters are used to mainpulate the response in some way to change how the domain concept is presented.
+A HTTP API is a set of resources that a consumer interacts with to achieve some desired objective. Each resource is identified by a URI. That's why it is called a Universal Resource Identifier. All resources in a HTTP API share a common base URL. Most API designers these days use just the path portion of the URL to identify the domain concept of interest. The authority part, i.e. schema and host, are just used to identify where the service is deployed, and the query parameters are used to manipulate the response in some way to change how the domain concept is presented.
 
 ### Path segments
 

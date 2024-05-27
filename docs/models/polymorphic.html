@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>Polymorphic Responses | API Anatomy </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="Polymorphic Responses | API Anatomy ">
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/APIPatterns/api-anatomy/blob/main/models/polymorphic.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+  </head>
+
+  <script type="module" src="./../public/docfx.min.js"></script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="api-anatomy">
+            api-anatomy
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="polymorphic-responses">Polymorphic Responses</h1>
+
+<ul>
+<li>Representing inheritance</li>
+<li>Inline schemas with a single allOf for the base type</li>
+<li>Array of anyOfs with one being the base type (why oneOf is likely wrong)</li>
+</ul>
+<p>Simulating inheritance using allOf.</p>
+<pre><code class="lang-yaml">components:
+  schemas:
+    cat:
+        type: object
+        allOf: 
+            - $ref: &quot;#/components/schemas/animal&quot;
+    animal:
+        type: object
+        properties:
+          species:
+            type: string
+</code></pre>
+<p>Any allOf constraint with a single $ref array member is considered a declaration of a base type.</p>
+<ol>
+<li>Given a schema</li>
+<li>If schema is a component type, name equals component name
+else type name is generated based on some context</li>
+<li>If schema contains allOf and other &quot;important properties???&quot;,
+2a. If allOf has one child schema that is a $ref, $ref points to base type
+else merge the allOfs into the current type
+2b. if schema contains oneOf. Throw up hands.</li>
+<li>if schema contains oneOf or anyOf
+4a. create wrapper class called ???
+4b. Create properties that correstpond to child schemas
+- primitives use the type name
+- objects use the paths and other context to construct &quot;best possible names&quot;.</li>
+</ol>
+<h2 id="still-to-investigate">Still to investigate:</h2>
+<p>Nested allOfs
+allOf primitive types?
+Should anyOf and oneOf be treated different for modelling</p>
+<p>Kiota =&gt; anyOf with shared properties actually deserialize the property twice.</p>
+<h2 id="proposing-new-keywords">Proposing new keywords</h2>
+<pre><code class="lang-yaml">components:
+  schemas:
+    foo:  
+      allOfAsExtends: # inheritance
+        - $ref: '#/components/schemas/base'
+        - $ref: '#/components/schemas/Otherbase'
+      allOf:   # spread
+        - $ref: '#/components/schemas/creationInfo'
+</code></pre>
+<p>Simulating using anyOf..</p>
+<pre><code class="lang-yaml">
+paths: 
+    /felines/{id}:
+        responses:
+            200:
+              description: ok
+              schema:
+                title: feline
+                anyOf:
+                  - $ref: &quot;#/components/animal&quot;
+                  - $ref: &quot;#/components/cat&quot;
+                  - $ref: &quot;#/components/tiger&quot;                  
+components:
+  schemas:
+    dog:
+        type: object
+    tiger:
+        type: object
+    cat:
+        type: object
+    animal:
+        type: object
+        properties:
+          species:
+            type: string
+    
+</code></pre>
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

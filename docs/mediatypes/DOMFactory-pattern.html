@@ -1,0 +1,382 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>DOM Factory Pattern | API Anatomy </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="DOM Factory Pattern | API Anatomy ">
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="../toc.html">
+      
+      <meta name="docfx:rel" content="../">
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/APIPatterns/api-anatomy/blob/main/mediatypes/DOMFactory-pattern.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+  </head>
+
+  <script type="module" src="./../public/docfx.min.js"></script>
+
+  <script>
+    const theme = localStorage.getItem('theme') || 'auto'
+    document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+  </script>
+
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../logo.svg" alt="api-anatomy">
+            api-anatomy
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+              <form class="search" role="search" id="search">
+                <i class="bi bi-search"></i>
+                <input class="form-control" id="search-query" type="search" disabled="" placeholder="Search" autocomplete="off" aria-label="Search">
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" style="margin-top: -.65em; margin-left: -.8em" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="dom-factory-pattern">DOM Factory Pattern</h1>
+
+<p>A pattern for serializing and deserializing structured documents that is resilient to the evolution of the document structure and the serialization syntax.</p>
+<h2 id="motivation">Motivation</h2>
+<p>Inter-process and network communication is prevalent in almost every piece of software today. Software applications talk to each other using application protocols that communicate messages. Those messages must be serialized and deserialized into order to be passed between applications.</p>
+<p>As software evolves the contents and shape of the message can change to meet new requirements or solve discovered problems. Changing messages has the potential to force changes in the all the software components that process those messages.  The DOMFactory pattern aims to minimize the impact of those changes by centralizing the logic that understands the nature of those changes in order to eliminate the need for other components to contain that logic.</p>
+<p>It is the responsibility of the owner of the message to encapsulate the changes made in different versions of the message so that consumers of the message only ever have to work with one version of the message.</p>
+<p>This enables consuming applications to transparently handle all previous versions.</p>
+<pre><code class="lang-mermaid">graph LR
+    messagev1 --&gt;|deserialize| messageDOMFactory
+    messagev2 --&gt;|deserialize| messageDOMFactory
+    messagev3 --&gt;|deserialize| messageDOMFactory
+    messageDOMFactory --&gt;|create| messageDOMv3
+    messageDOMv3 --&gt; |uses| consumerApp
+</code></pre>
+<p>This pattern also enables producer applications to generate previous versions (sometimes lossy) to drive consumer applications that do not yet support the latest version of the message.</p>
+<pre><code class="lang-mermaid">graph LR
+    producerApp --&gt;|creates| messageDOMv3
+    messageDOMv3 --&gt;|serialize| messagev1
+    messageDOMv3 --&gt;|serialize| messagev2
+    messageDOMv3 --&gt;|serialize| messagev3
+</code></pre>
+<h2 id="problem-statement">Problem Statement</h2>
+<p>Writing custom parsing and deserialization code for every message type requires a significant amount of code that is performance and security sensitive. To address this, most programming languages have developed generic libraries that can take a serialized message in a known format like JSON, XML or YAML and automatically translate it into a provided language type. This enables application developers to create language types that mirror the shape of the message and the automatic (de)serialization libraries are able to introspect the structure of the type and infer the mapping of the message to the type. Where there is missing metadata, annotations can be applied to the language type to guide the mapping. These automatic deserialization libraries usually have a set of global settings that allow expressing preferences that impact how values are maps because not every developer uses the same set of conventions when it comes to serialization. Examples of this for JSON, include character casing of object member names, format of dates, currencies and null object handling.</p>
+<p>With the convenience of automatic (de)serializers, the responsibility of message deserialization is usually left to the application developer who is consuming or producing the message.  However, when messages evolve, it becomes the responsibility of every application developer who produces or consumes that message to change their application code. For any non-trivial change it is likely that the automatic (de)serializer library will need to have a mirror type for each version of the message. This requires an app developer to at least partially read the message to discover the version of the message so it can select the right language type to deserialize, unless the version is passed out of band, or the application only chooses to support a single version.</p>
+<p>These challenges with handling multiple versions of a document lead producers and consumers to be slow to adopt new versions for fear of impacting existing partners, or when they do change they quickly drop support for the old versions due to application complexity. A worse outcome is when only partial features of a new version are supported so as to address immediate needs but without fully supporting that version. This leads to significant user confusion when validating messages.</p>
+<h2 id="solution-overview">Solution Overview</h2>
+<p>The vast majority of application defined messages are based on standard generic formats such as JSON, XML and YAML. This pattern attempts to address the problems described by breaking (de)serialization down into two distinct parts:</p>
+<ul>
+<li>translating between the serialized wire format and a syntax DOM based on the underlying document format. e.g. JSON</li>
+<li>translating between the syntax DOM (e.g. JsonDocument) and the application DOM (e.g. BankTransferV1)</li>
+</ul>
+<h3 id="format-parsing">Format Parsing</h3>
+<p>Using existing libraries for parsing the base format (e.g. JSON, XML or YAML) in the target language provides a secure and efficient way of converting the wire format into a base format DOM that can be processed. This standardization of formats like JSON, XML and YAML ensures a consistent interpretation of the wire format that is properly validated against the standard.</p>
+<pre><code class="lang-mermaid">
+graph LR
+  JSONString(Json String) --&gt; |Native Library| JSONDOM(JSON DOM) 
+</code></pre>
+<h3 id="application-domain-parsing">Application Domain Parsing</h3>
+<p>Once the base format DOM has been produced, it is traversed and the corresponding domain specific objects are created and populated with values that have are extracted from the base format DOM.</p>
+<pre><code class="lang-mermaid">
+graph LR
+  JSONDOM(JSON DOM) --&gt; |Mapping Code| DomainObject(Domain Object) 
+</code></pre>
+<p>The mapping code can be written by hand or generated, based on schemas, for complex documents. AI based assistants have proven very effective at suggesting the mapping code once they have seen a few examples and have example messages to work from.</p>
+<h2 id="structure-of-the-pattern">Structure of the Pattern</h2>
+<p>The pattern requires creating model classes and members that represent the content of the message. Each class requires the following elements:</p>
+<ul>
+<li><strong>consumer factory</strong>: a constructor or static factory method that accepts an compatible node from the base format syntax.</li>
+<li><strong>producer factory</strong>: a constructor or static factory method that enables creating the model independently of a message.</li>
+<li><strong>writer</strong>: A method that will serialize the object into passed base format document writer.</li>
+<li><strong>handlers</strong>: A member that holds a dictionary of actions where the wire format member name is the key.</li>
+</ul>
+<p>Consider the following JSON message:</p>
+<pre><code class="lang-json">    {
+        &quot;property&quot;: &quot;value&quot;,
+        &quot;element&quot;: {
+            &quot;property&quot;: 10
+        }
+    }
+
+</code></pre>
+<p>The following model objects would be required to represent the contents of the message.</p>
+<pre><code class="lang-mermaid">classDiagram
+
+    class MessageDocument {
+        -handlers Dictionary&amp;lt;string, action&amp;gt;
+        string Property
+
+        ctor(JsonElement value)
+        ctor()
+        Write(Utf8JsonWriter writer) void 
+    }
+    MessageDocument *--&gt; MessageElement
+
+    class MessageElement {
+        -handlers Dictionary&amp;lt;string, action&amp;gt;
+        int Property
+
+        ctor(JsonElement value)
+        ctor()
+        Write(Utf8JsonWriter writer) void 
+    }
+
+</code></pre>
+<p>If the handlers dictionary is static, then the action must accept an instance of the target model object as well as source base format DOM object.</p>
+<h2 id="implementation-details">Implementation Details</h2>
+<p>Once a wire format representation is deserialized into a base format DOM, such as a JsonDocument object, it is passed to the <strong>consumer factory</strong> method of the root model object to initiate the mapping of values from the base format DOM to the model objects.</p>
+<h3 id="consumer-factory-responsibilities">Consumer Factory Responsibilities</h3>
+<p>The consumer factory must create an instance of the target model object and then iterate through the members of the current base format DOM node, processing each member.</p>
+<p>If that node corresponds to a JsonObject then a helper method such as this can be used to execute the handler for each member in the JsonObject against the model instance.</p>
+<pre><code class="lang-csharp">    public static void ParseMap&lt;T&gt;(JsonElement node, T document, Dictionary&lt;string, Action&lt;T, JsonElement&gt;&gt; handlers)
+        {
+            foreach (var element in node.EnumerateObject())
+            {
+                handlers[element.Name](document, element.Value);
+            };
+        }
+</code></pre>
+<p>This method execute handlers for known members and will fail if a member exists in the wire format that is not recognized. Support for fields that match patterns can be added by <a href="https://github.com/microsoft/OpenAPI.NET/blob/c7aa71a3e86b6bc3e957a5488024e1397a34a050/src/Microsoft.OpenApi.Readers/ParseNodes/PropertyNode.cs#L32">testing the handler collection</a> first.  A secondary set of handlers can be provided for <a href="https://github.com/microsoft/OpenAPI.NET/blob/c7aa71a3e86b6bc3e957a5488024e1397a34a050/src/Microsoft.OpenApi.Readers/V3/OpenApiDocumentDeserializer.cs#L41">pattern matching</a>.</p>
+<h3 id="handlers">Handlers</h3>
+<p>Each handler in the dictionary of handlers provide an action (aka lambda) that will transfer information from a base format DOM node to a property of the object model. The key for the handler is the identifier used in the base format DOM. The action accepts the base format DOM node and in some cases the model object instance created by the consumer factory.</p>
+<h3 id="writer">Writer</h3>
+<p>Every model object requires a writer method that will accept a base format writer. The method writes the contents of the model object into the passed writer.</p>
+<h2 id="examples">Examples</h2>
+<p>Example of a root model object in C# that uses constructors for the <strong>producer factory</strong> and <strong>consumer factory</strong>.  The following examples use some <a href="https://github.com/microsoftgraph/kibali/blob/main/src/kibali/ParsingHelpers.cs">helper methods</a> to avoid repetitive code in the handler actions and factory methods.</p>
+<pre><code class="lang-csharp">public class ApiManifestDocument
+{
+    public Publisher? Publisher { get; set; }
+    public string? ApplicationName { get; set; }
+    public ApiDependencies ApiDependencies { get; set; } = new ApiDependencies();
+    public Extensions Extensions { get; set; } = new Extensions();
+
+    private const string PublisherProperty = &quot;publisher&quot;;
+    private const string ApplicationNameProperty = &quot;applicationName&quot;;
+    private const string ApiDependenciesProperty = &quot;apiDependencies&quot;;
+    private const string ExtensionsProperty = &quot;extensions&quot;;
+
+    public ApiManifestDocument(string applicationName)
+    {
+        ApplicationName = applicationName;
+        Validate();
+    }
+
+    public ApiManifestDocument(JsonElement value)
+    {
+        ParsingHelpers.ParseMap(value, this, handlers);
+        Validate();
+    }
+
+    // Write method
+    public void Write(Utf8JsonWriter writer)
+    {
+        ValidationHelpers.ThrowIfNull(writer, nameof(writer));
+        Validate();
+        writer.WriteStartObject();
+        writer.WriteString(ApplicationNameProperty, ApplicationName);
+        if (Publisher != null)
+        {
+            writer.WritePropertyName(PublisherProperty);
+            Publisher.Write(writer);
+        }
+        if (ApiDependencies.Any())
+        {
+            writer.WritePropertyName(ApiDependenciesProperty);
+            writer.WriteStartObject();
+            foreach (var apiDependency in ApiDependencies)
+            {
+                writer.WritePropertyName(apiDependency.Key);
+                apiDependency.Value.Write(writer);
+            }
+            writer.WriteEndObject();
+        }
+        if (Extensions.Any())
+        {
+            writer.WritePropertyName(ExtensionsProperty);
+            Extensions.Write(writer);
+        }
+        writer.WriteEndObject();
+    }
+
+    // Load method
+    public static ApiManifestDocument Load(JsonElement value)
+    {
+        return new ApiManifestDocument(value);
+    }
+
+    internal void Validate()
+    {
+        ValidationHelpers.ValidateNullOrWhitespace(nameof(ApplicationName), ApplicationName, nameof(ApiManifestDocument));
+        Publisher?.Validate();
+    }
+
+    // Create fixed field map for ApiManifest
+    private static readonly FixedFieldMap&lt;ApiManifestDocument&gt; handlers = new()
+    {
+        { ApplicationNameProperty, (o,v) =&gt; {o.ApplicationName = v.GetString(); } },
+        { PublisherProperty, (o,v) =&gt; {o.Publisher = Publisher.Load(v);  } },
+        { ApiDependenciesProperty, (o,v) =&gt; {o.ApiDependencies = new ApiDependencies(ParsingHelpers.GetMap(v, ApiDependency.Load));  } },
+        { ExtensionsProperty, (o,v) =&gt; {o.Extensions = Extensions.Load(v);  } }
+    };
+}
+</code></pre>
+<p><a href="https://github.com/microsoft/openapi.apimanifest">https://github.com/microsoft/openapi.apimanifest</a></p>
+<p>Example of a child model object in C# that uses a static factory method instead of constructor as a <strong>consumer factory</strong>.</p>
+<pre><code class="lang-csharp">    public class Permission
+    {
+        public string Note { get; set; }
+        public bool Implicit { get; set; } = false;
+        public string PrivilegeLevel { get; set; }
+        public SortedDictionary&lt;string, Scheme&gt; Schemes { get; set; } = new SortedDictionary&lt;string, Scheme&gt;();
+        public List&lt;PathSet&gt; PathSets { get; set; } = new List&lt;PathSet&gt;();
+        public OwnerInfo OwnerInfo { get; set; } = new();
+
+        public void Write(Utf8JsonWriter writer)
+        {
+            writer.WriteStartObject();
+
+            if (!string.IsNullOrWhiteSpace(Note)) writer.WriteString(&quot;note&quot;, Note);
+            if (Implicit) writer.WriteBoolean(&quot;implicit&quot;, Implicit);
+
+            writer.WritePropertyName(&quot;schemes&quot;);
+            writer.WriteStartObject();
+            foreach (var scheme in Schemes)
+            {
+                writer.WritePropertyName(scheme.Key.ToString());
+                scheme.Value.Write(writer);
+            }
+            writer.WriteEndObject();
+
+            writer.WritePropertyName(&quot;pathSets&quot;);
+            writer.WriteStartArray();
+            foreach (var pathSet in PathSets)
+            {
+                pathSet.Write(writer);
+            }
+            writer.WriteEndArray();
+
+            writer.WritePropertyName(&quot;ownerInfo&quot;);
+            OwnerInfo.Write(writer);
+
+            writer.WriteEndObject();
+        }
+
+        internal static Permission Load(JsonElement value)
+        {
+            var permission = new Permission();
+            ParsingHelpers.ParseMap(value, permission, handlers);
+            return permission;
+        }
+
+        private static FixedFieldMap&lt;Permission&gt; handlers = new()
+        {
+            { &quot;note&quot;, (o,v) =&gt; {o.Note = v.GetString();  } },
+            { &quot;privilegeLevel&quot;, (o,v) =&gt; {o.PrivilegeLevel= v.GetString();  } },
+            { &quot;implicit&quot;, (o,v) =&gt; {o.Implicit = v.GetBoolean();  } },
+            { &quot;pathSets&quot;, (o,v) =&gt; {o.PathSets = ParsingHelpers.GetList(v, PathSet.Load);  } },
+            { &quot;schemes&quot;, (o,v) =&gt; {o.Schemes = ParsingHelpers.GetOrderedMap(v, Scheme.Load);  } },
+            { &quot;ownerInfo&quot;, (o,v) =&gt; {o.OwnerInfo = OwnerInfo.Load(v);  } },
+        };
+    }
+
+</code></pre>
+<p><a href="https://github.com/microsoftgraph/kibali/blob/main/src/kibali/Permission.cs">https://github.com/microsoftgraph/kibali/blob/main/src/kibali/Permission.cs</a></p>
+<p>For object models that have a complex inheritance hierarchy there may be benefits to creating the dictionary of handlers from an object instance rather than having it as a static dictionary.</p>
+<pre><code class="lang-csharp">        public override IDictionary&lt;string, Action&lt;IParseNode&gt;&gt; GetFieldDeserializers() {
+            return new Dictionary&lt;string, Action&lt;IParseNode&gt;&gt;(base.GetFieldDeserializers()) {
+                {&quot;attachmentSessions&quot;, n =&gt; { AttachmentSessions = n.GetCollectionOfObjectValues&lt;AttachmentSession&gt;(AttachmentSession.CreateFromDiscriminatorValue)?.ToList(); } },
+                {&quot;attachments&quot;, n =&gt; { Attachments = n.GetCollectionOfObjectValues&lt;AttachmentBase&gt;(AttachmentBase.CreateFromDiscriminatorValue)?.ToList(); } },
+                {&quot;body&quot;, n =&gt; { Body = n.GetObjectValue&lt;ItemBody&gt;(ItemBody.CreateFromDiscriminatorValue); } },
+                {&quot;bodyLastModifiedDateTime&quot;, n =&gt; { BodyLastModifiedDateTime = n.GetDateTimeOffsetValue(); } },
+                {&quot;categories&quot;, n =&gt; { Categories = n.GetCollectionOfPrimitiveValues&lt;string&gt;()?.ToList(); } },
+                {&quot;checklistItems&quot;, n =&gt; { ChecklistItems = n.GetCollectionOfObjectValues&lt;ChecklistItem&gt;(ChecklistItem.CreateFromDiscriminatorValue)?.ToList(); } },
+                {&quot;completedDateTime&quot;, n =&gt; { CompletedDateTime = n.GetObjectValue&lt;DateTimeTimeZone&gt;(DateTimeTimeZone.CreateFromDiscriminatorValue); } },
+                {&quot;createdDateTime&quot;, n =&gt; { CreatedDateTime = n.GetDateTimeOffsetValue(); } },
+                {&quot;dueDateTime&quot;, n =&gt; { DueDateTime = n.GetObjectValue&lt;DateTimeTimeZone&gt;(DateTimeTimeZone.CreateFromDiscriminatorValue); } },
+                {&quot;extensions&quot;, n =&gt; { Extensions = n.GetCollectionOfObjectValues&lt;Extension&gt;(Extension.CreateFromDiscriminatorValue)?.ToList(); } },
+                {&quot;hasAttachments&quot;, n =&gt; { HasAttachments = n.GetBoolValue(); } },
+                {&quot;importance&quot;, n =&gt; { Importance = n.GetEnumValue&lt;Importance&gt;(); } },
+                {&quot;isReminderOn&quot;, n =&gt; { IsReminderOn = n.GetBoolValue(); } },
+                {&quot;lastModifiedDateTime&quot;, n =&gt; { LastModifiedDateTime = n.GetDateTimeOffsetValue(); } },
+                {&quot;linkedResources&quot;, n =&gt; { LinkedResources = n.GetCollectionOfObjectValues&lt;LinkedResource&gt;(LinkedResource.CreateFromDiscriminatorValue)?.ToList(); } },
+                {&quot;recurrence&quot;, n =&gt; { Recurrence = n.GetObjectValue&lt;PatternedRecurrence&gt;(PatternedRecurrence.CreateFromDiscriminatorValue); } },
+                {&quot;reminderDateTime&quot;, n =&gt; { ReminderDateTime = n.GetObjectValue&lt;DateTimeTimeZone&gt;(DateTimeTimeZone.CreateFromDiscriminatorValue); } },
+                {&quot;startDateTime&quot;, n =&gt; { StartDateTime = n.GetObjectValue&lt;DateTimeTimeZone&gt;(DateTimeTimeZone.CreateFromDiscriminatorValue); } },
+                {&quot;status&quot;, n =&gt; { Status = n.GetEnumValue&lt;TaskStatus&gt;(); } },
+                {&quot;title&quot;, n =&gt; { Title = n.GetStringValue(); } },
+            };
+        }
+
+</code></pre>
+<p><a href="https://github.com/microsoftgraph/msgraph-sdk-dotnet/blob/dev/src/Microsoft.Graph/Generated/Models/TodoTask.cs">https://github.com/microsoftgraph/msgraph-sdk-dotnet/blob/dev/src/Microsoft.Graph/Generated/Models/TodoTask.cs</a> and the equivalent in Java <a href="https://github.com/microsoftgraph/msgraph-sdk-java/blob/f2960ba4d02bb15a01a9b2750d43c5e978eb21b4/src/main/java/com/microsoft/graph/generated/models/TodoTask.java#L113">https://github.com/microsoftgraph/msgraph-sdk-java/blob/f2960ba4d02bb15a01a9b2750d43c5e978eb21b4/src/main/java/com/microsoft/graph/generated/models/TodoTask.java#L113</a></p>
+<p>In this particular example, the models are generated from a schema.  The actions in the handler dictionary only accept a single parameter because the target model instance is closed over by the lambda.</p>
+
+</article>
+
+
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+    <div class="container-xxl search-results" id="search-results"></div>
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

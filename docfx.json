@@ -1,0 +1,36 @@
+{
+  "build": {
+    "content": [
+      {
+        "files": [
+          "**/*.{md,yml}"
+        ],
+        "exclude": [
+          "docs/**"
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+          "images/**",
+          "**/*.html"
+        ]
+      }
+    ],
+    "output": "docs",
+    "template": [
+      "default",
+      "modern"
+    ],
+    "globalMetadata": {
+      "_appName": "api-anatomy",
+      "_appTitle": "API Anatomy",
+      "_enableSearch": true,
+      "_disableNavbar": false,
+      "_disableContribution": true,
+      "_disableNextArticle": true,
+      "pdf": true
+    }
+  }
+}

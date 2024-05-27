@@ -1,0 +1,182 @@
+{
+  "source_base_path": "C:/Users/darrmi/src/github/APIPatterns/api-anatomy",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "Resource",
+      "output": {
+        "resource": {
+          "relative_path": "index.json"
+        }
+      }
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "README.md",
+      "output": {
+        ".html": {
+          "relative_path": "README.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "mediatypes/DOMFactory-pattern.md",
+      "output": {
+        ".html": {
+          "relative_path": "mediatypes/DOMFactory-pattern.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "methods.md",
+      "output": {
+        ".html": {
+          "relative_path": "methods.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "models/polymorphic.md",
+      "output": {
+        ".html": {
+          "relative_path": "models/polymorphic.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "models/union-types.md",
+      "output": {
+        ".html": {
+          "relative_path": "models/union-types.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "path/category.md",
+      "output": {
+        ".html": {
+          "relative_path": "path/category.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "path/collection.md",
+      "output": {
+        ".html": {
+          "relative_path": "path/collection.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "path/data-partition.md",
+      "output": {
+        ".html": {
+          "relative_path": "path/data-partition.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "path/function.md",
+      "output": {
+        ".html": {
+          "relative_path": "path/function.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "path/item.md",
+      "output": {
+        ".html": {
+          "relative_path": "path/item.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "path/key-value-pair.md",
+      "output": {
+        ".html": {
+          "relative_path": "path/key-value-pair.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "path/matrix.md",
+      "output": {
+        ".html": {
+          "relative_path": "path/matrix.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "path/multi-segment.md",
+      "output": {
+        ".html": {
+          "relative_path": "path/multi-segment.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "path/relationship.md",
+      "output": {
+        ".html": {
+          "relative_path": "path/relationship.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "path/version.md",
+      "output": {
+        ".html": {
+          "relative_path": "path/version.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html"
+        },
+        ".json": {
+          "relative_path": "toc.json"
+        }
+      },
+      "version": ""
+    }
+  ],
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}
